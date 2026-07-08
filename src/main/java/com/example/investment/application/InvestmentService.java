@@ -18,7 +18,7 @@ public class InvestmentService {
     }
 
     public Investment addInvestment(Investment investment) {
-        investmentValidator.validate(investment, null);
+        investmentValidator.validateForCreate(investment);
         return investmentRepository.save(investment);
     }
 
@@ -27,7 +27,7 @@ public class InvestmentService {
      */
     public Investment updateInvestment(Investment investment) {
         assertInvestmentExists(investment.getId());
-        investmentValidator.validate(investment, investment.getId());
+        investmentValidator.validateForUpdate(investment);
         return investmentRepository.save(investment);
     }
 

@@ -29,39 +29,19 @@ public class Investment {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public double getValue() {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
-    }
-
     public String getAcquisitionDate() {
         return acquisitionDate;
     }
 
-    public void setAcquisitionDate(String acquisitionDate) {
-        this.acquisitionDate = acquisitionDate;
-    }
-
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

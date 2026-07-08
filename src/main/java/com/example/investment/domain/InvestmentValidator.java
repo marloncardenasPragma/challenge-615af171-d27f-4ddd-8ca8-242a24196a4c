@@ -13,22 +13,37 @@ public class InvestmentValidator {
     }
 
     /**
-     * Valida las reglas de negocio de una inversión: valor positivo y nombre no duplicado.
+     * Valida las reglas de negocio para crear una inversión: valor positivo y nombre no duplicado.
      *
-     * @param investment inversión a validar
-     * @param excludeId  id a excluir del chequeo de duplicados; {@code null} al crear,
-     *                   el propio id de la inversión al actualizar
      * @throws IllegalArgumentException si el valor no es positivo o el nombre ya está en uso
      */
-    public void validate(Investment investment, String excludeId) {
+    public void validateForCreate(Investment investment) {
+        validateValue(investment);
+        if (investmentRepository.existsByName(investment.getName())) {
+            throw duplicateNameException();
+        }
+    }
+
+    /**
+     * Valida las reglas de negocio para actualizar una inversión: valor positivo y nombre no
+     * duplicado, excluyendo a la propia inversión del chequeo de duplicados.
+     *
+     * @throws IllegalArgumentException si el valor no es positivo o el nombre ya está en uso
+     */
+    public void validateForUpdate(Investment investment) {
+        validateValue(investment);
+        if (investmentRepository.existsByNameAndIdNot(investment.getName(), investment.getId())) {
+            throw duplicateNameException();
+        }
+    }
+
+    private void validateValue(Investment investment) {
         if (investment.getValue() <= 0) {
             throw new IllegalArgumentException("El valor de la inversión debe ser positivo.");
         }
-        boolean nameTaken = excludeId == null
-                ? investmentRepository.existsByName(investment.getName())
-                : investmentRepository.existsByNameAndIdNot(investment.getName(), excludeId);
-        if (nameTaken) {
-            throw new IllegalArgumentException("Ya existe una inversión con el mismo nombre.");
-        }
+    }
+
+    private static IllegalArgumentException duplicateNameException() {
+        return new IllegalArgumentException("Ya existe una inversión con el mismo nombre.");
     }
 }

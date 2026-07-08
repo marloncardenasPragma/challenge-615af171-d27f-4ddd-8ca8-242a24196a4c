@@ -42,7 +42,7 @@ class InvestmentServiceTest {
 
         assertNotNull(result);
         assertEquals(investment, result);
-        verify(investmentValidator, times(1)).validate(investment, null);
+        verify(investmentValidator, times(1)).validateForCreate(investment);
         verify(investmentRepository, times(1)).save(investment);
     }
 
@@ -56,7 +56,7 @@ class InvestmentServiceTest {
 
         assertNotNull(result);
         assertEquals(investment, result);
-        verify(investmentValidator, times(1)).validate(investment, "1");
+        verify(investmentValidator, times(1)).validateForUpdate(investment);
         verify(investmentRepository, times(1)).save(investment);
     }
 
