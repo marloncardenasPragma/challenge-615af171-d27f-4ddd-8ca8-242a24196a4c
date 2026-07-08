@@ -18,20 +18,34 @@ public class InvestmentService {
     }
 
     public Investment addInvestment(Investment investment) {
-        investmentValidator.validate(investment);
+        investmentValidator.validate(investment, null);
         return investmentRepository.save(investment);
     }
 
+    /**
+     * @throws IllegalArgumentException si no existe una inversión con el id de {@code investment}
+     */
     public Investment updateInvestment(Investment investment) {
-        investmentValidator.validate(investment);
+        assertInvestmentExists(investment.getId());
+        investmentValidator.validate(investment, investment.getId());
         return investmentRepository.save(investment);
     }
 
+    /**
+     * @throws IllegalArgumentException si no existe una inversión con el id dado
+     */
     public void deleteInvestment(String id) {
+        assertInvestmentExists(id);
         investmentRepository.deleteById(id);
     }
 
     public List<Investment> getAllInvestments() {
         return investmentRepository.findAll();
+    }
+
+    private void assertInvestmentExists(String id) {
+        if (!investmentRepository.existsById(id)) {
+            throw new IllegalArgumentException("Inversión no encontrada.");
+        }
     }
 }

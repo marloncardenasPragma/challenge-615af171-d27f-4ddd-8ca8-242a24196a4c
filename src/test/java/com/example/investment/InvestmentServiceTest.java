@@ -3,20 +3,25 @@ package com.example.investment;
 import com.example.investment.application.InvestmentService;
 import com.example.investment.domain.InvestmentValidator;
 import com.example.investment.infrastructure.InvestmentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class InvestmentServiceTest {
 
     @Mock
@@ -28,41 +33,65 @@ class InvestmentServiceTest {
     @InjectMocks
     private InvestmentService investmentService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    void testAddInvestment() {
+    void addInvestmentValidatesAsCreateThenSaves() {
         Investment investment = new Investment("1", "Inversion 1", 1000.0, "2024-06-01", "Tipo 1");
         when(investmentRepository.save(investment)).thenReturn(investment);
+
         Investment result = investmentService.addInvestment(investment);
+
         assertNotNull(result);
         assertEquals(investment, result);
+        verify(investmentValidator, times(1)).validate(investment, null);
         verify(investmentRepository, times(1)).save(investment);
     }
 
     @Test
-    void testUpdateInvestment() {
+    void updateInvestmentValidatesAsUpdateThenSaves() {
         Investment investment = new Investment("1", "Inversion 1", 1000.0, "2024-06-01", "Tipo 1");
+        when(investmentRepository.existsById("1")).thenReturn(true);
         when(investmentRepository.save(investment)).thenReturn(investment);
+
         Investment result = investmentService.updateInvestment(investment);
+
         assertNotNull(result);
         assertEquals(investment, result);
+        verify(investmentValidator, times(1)).validate(investment, "1");
         verify(investmentRepository, times(1)).save(investment);
     }
 
     @Test
-    void testDeleteInvestment() {
+    void updateInvestmentRejectsUnknownId() {
+        Investment investment = new Investment("missing", "Inversion 1", 1000.0, "2024-06-01", "Tipo 1");
+        when(investmentRepository.existsById("missing")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> investmentService.updateInvestment(investment));
+        verify(investmentRepository, never()).save(investment);
+    }
+
+    @Test
+    void deleteInvestmentDeletesWhenIdExists() {
+        when(investmentRepository.existsById("1")).thenReturn(true);
+
         investmentService.deleteInvestment("1");
+
         verify(investmentRepository, times(1)).deleteById("1");
     }
 
     @Test
-    void testGetAllInvestments() {
+    void deleteInvestmentRejectsUnknownId() {
+        when(investmentRepository.existsById("missing")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> investmentService.deleteInvestment("missing"));
+        verify(investmentRepository, never()).deleteById("missing");
+    }
+
+    @Test
+    void getAllInvestmentsReturnsRepositoryResult() {
         when(investmentRepository.findAll()).thenReturn(Collections.emptyList());
+
         List<Investment> result = investmentService.getAllInvestments();
+
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(investmentRepository, times(1)).findAll();

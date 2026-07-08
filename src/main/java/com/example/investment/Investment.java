@@ -1,5 +1,6 @@
 package com.example.investment;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -8,6 +9,7 @@ public class Investment {
     @Id
     private String id;
     private String name;
+    @Column(name = "investment_value")
     private double value;
     private String acquisitionDate;
     private String type;
