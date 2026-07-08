@@ -2,9 +2,11 @@ package com.example.investment.domain;
 
 import com.example.investment.Investment;
 import com.example.investment.infrastructure.InvestmentRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class InvestmentValidator {
     private final InvestmentRepository investmentRepository;
 

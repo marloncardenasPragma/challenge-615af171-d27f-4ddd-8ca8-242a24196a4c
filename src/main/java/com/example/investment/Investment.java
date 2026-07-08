@@ -1,11 +1,19 @@
 package com.example.investment;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Investment {
+    @Id
     private String id;
     private String name;
     private double value;
     private String acquisitionDate;
     private String type;
+
+    protected Investment() {
+    }
 
     public Investment(String id, String name, double value, String acquisitionDate, String type) {
         this.id = id;
